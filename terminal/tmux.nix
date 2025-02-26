@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 with lib;
-
 let
   isDarwin = pkgs.stdenv.isDarwin;
   getClipboardCmd = if isDarwin then
@@ -11,7 +10,7 @@ let
   else
     "${pkgs.wl-clipboard}/bin/wl-copy";
     
-  # Common TMux configuration for both NixOS module and home-manager
+  # Common TMux configuration
   tmuxConfig = ''
     # Basic Settings
     set -g mouse on
@@ -47,7 +46,7 @@ let
     ''}
   '';
   
-  # Common plugins for both NixOS and home-manager
+  # Common plugins
   tmuxPlugins = with pkgs.tmuxPlugins; [
     tmux-powerline
     continuum
@@ -75,20 +74,4 @@ in {
       extraConfig = tmuxConfig;
     };
   };
-  
-  # Home-manager integration (if available)
-  home-manager.users = mkIf (config.home-manager.users != {} or false) (
-    mapAttrs (username: userConfig: {
-      programs.tmux = {
-        enable = true;
-        baseIndex = 1;
-        keyMode = "vi";
-        escapeTime = 0;
-        terminal = "tmux-256color";
-        historyLimit = 2000;
-        plugins = tmuxPlugins;
-        extraConfig = tmuxConfig;
-      };
-    }) (config.home-manager.users or {})
-  );
 }
